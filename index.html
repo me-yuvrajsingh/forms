@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- {% load static %} -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Create Account</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Signup Modal -->
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+  <div class="signup-container" id="signup-container">
+    <h2>Create Account</h2>
+    <p class="subtitle">Join us by creating your account</p>
+    <form id="signup-form" method="post">
+      <!-- {% csrf_token %} -->
+      <!-- Full Name -->
+      <div class="form-group">
+        <div style="width: 100%; position: relative;">
+          <input type="text" id="full-name" name="full-name" placeholder="Full Name" required>
+          <span class="underline"></span>
+        </div>
+        <span class="error animate__animated animate__fadeInDown">this is error</span>
+      </div>
+      <!-- Email -->
+      <div class="form-group">
+        <div style="width: 100%; position: relative;">
+          <input type="email" id="email" name="email" placeholder="Email" required>
+          <span class="underline"></span>
+        </div>
+        <span class="error animate__animated animate__fadeInDown">this is error</span>
+      </div>
+      <!-- Phone Number -->
+      <div class="form-group">
+        <div style="width: 100%; position: relative;">
+          <input type="tel" id="phone" name="phone" placeholder="Phone Number" required>
+          <span class="underline"></span>
+        </div>
+        <span class="error animate__animated animate__fadeInDown">this is error</span>
+      </div>
+      <!-- Password -->
+      <div class="form-group password-group">
+        <div style="width: 100%; position: relative;">
+        <input type="password" name="password" id="password" placeholder="Password" required>
+        <span class="underline"></span>
+        <span class="toggle-password">
+          <i class="fa fa-eye" id="eye-icon"></i>
+        </span>
+      </div>
+        <span class="error animate__animated animate__fadeInDown">this is error</span>
+      </div>
+      <!-- Confirm Password -->
+      <div class="form-group">
+        <div style="width: 100%; position: relative;">
+        <input type="password" name="confirm-password" id="confirm-password" placeholder="Confirm Password" required>
+        <span class="underline"></span>
+      </div>
+        <span class="error animate__animated animate__fadeInDown">this is error</span>
+      </div>
+      <!-- Signup Button -->
+      <button type="submit" class="btn" id="signup-btn">Sign Up</button>
+    </form>
+    <!-- Login Link -->
+    <p class="login-link">Already have an account? <a href="login.html">Login</a></p>
+  </div>
+
+<script>
+    const signupContainer = document.getElementById("signup-container");
+const passwordInput = document.getElementById("password");
+const confirmPasswordInput = document.getElementById("confirm-password");
+const eyeIcon = document.getElementById("eye-icon");
+let signupForm = document.getElementById("signup-form");
+let fullName = document.getElementById("full-name");
+let submitBtn = document.getElementById("signup-btn");
+
+// Toggle password visibility
+eyeIcon.addEventListener("click", () => {
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text";
+    eyeIcon.classList.remove("fa-eye");
+    eyeIcon.classList.add("fa-eye-slash");
+  } else {
+    passwordInput.type = "password";
+    eyeIcon.classList.remove("fa-eye-slash");
+    eyeIcon.classList.add("fa-eye");
+  }
+});
+
+// Your existing code here...
+
+// Add form validation
+function validateForm() {
+  // event.preventDefault(); // Prevent form submission until validation is done
+
+  let isValid = true;
+
+  // Full Name Validation
+  const fullNameValue = fullName.value.trim();
+  if (fullNameValue.length < 1 || fullNameValue.length > 32) {
+    isValid = false;
+    showError(fullName, "Full name must be between 1 and 32 characters.");
+  } else {
+    hideError(fullName);
+  }
+
+  // Email Validation
+  const emailValue = document.getElementById("email").value.trim();
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailPattern.test(emailValue)) {
+    isValid = false;
+    showError(document.getElementById("email"), "Please enter a valid email.");
+  } else {
+    hideError(document.getElementById("email"));
+  }
+
+  // Phone Number Validation (simple regex for basic format)
+  const phoneValue = document.getElementById("phone").value.trim();
+  const phonePattern = /^[0-9\+\-()]{7,15}$/;
+  if (!phonePattern.test(phoneValue)) {
+    isValid = false;
+    showError(document.getElementById("phone"), "Please enter a valid phone number.");
+  } else {
+    hideError(document.getElementById("phone"));
+  }
+
+  // Password Validation
+  const passwordValue = passwordInput.value.trim();
+  if (passwordValue.length < 8) {
+    isValid = false;
+    showError(passwordInput, "Password must be at least 8 characters.");
+  } else {
+    hideError(passwordInput);
+  }
+
+  // Confirm Password Validation
+  const confirmPasswordValue = confirmPasswordInput.value.trim();
+  if (confirmPasswordValue !== passwordValue) {
+    isValid = false;
+    showError(confirmPasswordInput, "Passwords do not match.");
+  } else {
+    hideError(confirmPasswordInput);
+  }
+
+  // If everything is valid, submit the form
+  return isValid
+}
+
+// Show error message
+function showError(input, message) {
+  input.addEventListener('keyup', validateForm)
+  const errorSpan = input.parentElement.nextElementSibling;
+  errorSpan.textContent = message;
+  errorSpan.style.display = "flex"; // Display the error message
+}
+
+// Hide error message
+function hideError(input) {
+  const errorSpan = input.parentElement.nextElementSibling;
+  errorSpan.classList.add('animate__fadeOutDown')
+  setTimeout(() => {
+    errorSpan.style.display = "none"; // Hide the error message
+  }, 500);
+}
+
+// Add event listener for form submission
+
+signupForm.addEventListener('submit', (e)=>{
+  e.preventDefault()
+  console.log(validateForm())
+  if(validateForm()){
+    signupForm.submit();
+  }
+})
+
+// submitBtn.addEventListener('click', ()=>{
+
+//   console.log(validateForm())
+// })
+</script>
+</body>
+</html>

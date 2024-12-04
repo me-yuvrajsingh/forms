@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>product upload</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1 style="margin: 2rem auto; text-align: center;">Upload Product</h1>
+    <form id="product-upload-form" method="post" enctype="multipart/form-data" action="/upload-product">
+        <!-- {% csrf_token %} -->
+      
+        <!-- Product Name -->
+        <div class="form-group">
+            <label for="prod_name">Product Name</label>
+            <div class="inputs">
+                <input type="text" id="prod_name" name="prod_name" required>
+                <span class="underline"></span>
+                <span class="error" id="prod_name_error"></span>
+            </div>
+        </div>
+      
+        <!-- Product Description -->
+        <div class="form-group">
+            <label for="prod_desc">Product Description</label>
+            <div class="inputs">
+                <textarea id="prod_desc" name="prod_desc" hidden></textarea>
+                <div class="editor-container">
+                    <div class="editor-toolbar">
+                        <button type="button" class="btn" data-command="bold" title="Bold"><i class="fa fa-bold"></i></button>
+                        <button type="button" class="btn" data-command="italic" title="Italic"><i class="fa fa-italic"></i></button>
+                        <button type="button" class="btn" data-command="underline" title="Underline"><i class="fa fa-underline"></i></button>
+                        <button type="button" class="btn" data-command="strikeThrough" title="Strikethrough"><i class="fa fa-strikethrough"></i></button>
+                        <select class="font-size" data-command="fontSize" title="Font Size">
+                            <option value="1">10px</option>
+                            <option value="2">13px</option>
+                            <option value="3" selected>16px</option>
+                            <option value="4">18px</option>
+                            <option value="5">24px</option>
+                            <option value="6">32px</option>
+                            <option value="7">48px</option>
+                        </select>
+                    </div>
+                    <div class="editor-textarea" contenteditable="true"></div>
+                    <span class="underline"></span>
+                </div>
+                
+                
+                
+                <span class="error" id="prod_desc_error"></span>
+            </div>
+        </div>
+      
+        <!-- Minimum Bid -->
+        <div class="form-group">
+            <label for="prod_min_bid">Minimum Bid</label>
+            <div class="inputs">
+                <input type="number" id="prod_min_bid" name="prod_min_bid" step="0.01" required>
+                <span class="underline"></span>
+                <span class="error" id="prod_min_bid_error"></span>
+            </div>
+        </div>
+      
+        <!-- Auction Expiry -->
+        <div class="form-group">
+            <label for="prod_auction_expiry">Auction Expiry Date & Time</label>
+            <div class="inputs">
+                <input type="datetime-local" id="prod_auction_expiry" name="prod_auction_expiry" required>
+                <span class="underline"></span>
+                <span class="error" id="prod_auction_expiry_error"></span>
+            </div>
+        </div>
+      
+        <!-- Media Upload -->
+        <!-- <div class="media-upload-section">
+          <h3>Upload Media</h3>
+          <div class="media-container" id="media-container">
+            <div class="upload-box" onclick="document.querySelector('#media-upload-inp-hidden').click()">
+              <input type="file" id="media-upload-inp-hidden" name="media_files[]" accept="image/*,video/*" class="media-input" hidden>
+              <button type="button" class="add-media-btn">+</button>
+            </div>
+            <span class="error" id="media_error"></span>
+          </div>
+        </div> -->
+    
+        <div class="media-upload-section">
+            <label>Upload Media</label>
+            <div class="media-container" id="media-container">
+    
+                <!-- Hidden file input to upload media -->
+                <div class="upload-box" onclick="document.querySelector('#media-upload-inp-hidden').click()">
+                            <input type="file" id="media-upload-inp-hidden" name="media_files[]" accept="image/*,video/*" class="media-input" hidden multiple>
+                            <button type="button" class="add-media-btn">+</button>
+                </div>
+    
+                <!-- This is where the uploaded images/videos will be displayed -->
+                <div class="uploaded-media" id="uploaded-media"></div>
+                <span class="error" id="media_error"></span>
+            </div>
+        </div>
+        
+      
+        <!-- Submit Button -->
+        <button type="submit" id="submit-btn">Upload Product</button>
+      </form>
+      
+
+    <script>
+    let mediaFiles = []
+    document.querySelector('#media-upload-inp-hidden').addEventListener('change', function (event) {
+        let files = event.target.files; // Get all uploaded files
+        let uploadedMediaContainer = document.getElementById('uploaded-media'); // Get the container for uploaded media
+    
+        // Loop through all uploaded files
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+    
+            // Create a container for each media item
+            let mediaItem = document.createElement('div');
+            mediaItem.classList.add('media-item');
+    
+            // Add close button
+            let closeBtn = document.createElement('button');
+            closeBtn.classList.add('close-btn');
+            closeBtn.innerHTML = 'x';
+            closeBtn.onclick = function () {
+                uploadedMediaContainer.removeChild(mediaItem);
+            };
+
+            mediaFiles.push(file)
+    
+            // Check the file type and create the appropriate element
+            if (file.type.startsWith('image/')) {
+                let img = document.createElement('img');
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                mediaItem.appendChild(img);
+            } else if (file.type.startsWith('video/')) {
+                let video = document.createElement('video');
+                video.controls = false; // Allow video controls
+                video.pause()
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    video.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                mediaItem.appendChild(video);
+            }
+    
+            // Append the close button to the media item
+            mediaItem.appendChild(closeBtn);
+    
+            // Add the media item to the uploaded media container
+            console.log(mediaItem)
+            uploadedMediaContainer.appendChild(mediaItem);
+            console.log(mediaFiles)
+        }
+    });
+    
+    
+  
+    // Remove media box
+    $(document).on("click", ".remove-media-btn", function () {
+      $(this).closest(".upload-box").remove();
+      mediaCount--;
+    });
+  
+    // Validate Form on Submit
+    $("#product-upload-form").submit(function (e) {
+      let isValid = true;
+
+      document.querySelector('#prod_desc').value = document.querySelector(".editor-textarea").innerHTML;
+      // document.querySelector('#media-upload-inp-hidden').value = '';
+      const formData = new FormData();
+      mediaFiles.forEach((file) => {
+        formData.append('media_files[]', file);
+      });
+  
+      // Validate product name
+      if ($("#prod_name").val().trim() === "") {
+        $("#prod_name_error").text("Product name is required.");
+        isValid = false;
+      } else {
+        $("#prod_name_error").text("");
+      }
+  
+      // Validate description
+      if ($("#prod_desc").val().trim() === "") {
+        $("#prod_desc_error").text("Description is required.");
+        isValid = false;
+      } else {
+        $("#prod_desc_error").text("");
+      }
+  
+      // Validate minimum bid
+      if ($("#prod_min_bid").val().trim() === "" || parseFloat($("#prod_min_bid").val()) <= 0) {
+        $("#prod_min_bid_error").text("Valid minimum bid is required.");
+        isValid = false;
+      } else {
+        $("#prod_min_bid_error").text("");
+      }
+  
+      // Validate media
+      if (document.querySelector(".uploaded-media").childElementCount < 2) {
+        $("#media_error").text("At least 2 media files are required.");
+        isValid = false;
+      } else {
+        $("#media_error").text("");
+      }
+  
+      if (!isValid) e.preventDefault(); // Stop form submission if validation fails
+    });
+  
+
+//   text area 
+document.addEventListener("DOMContentLoaded", () => {
+    const toolbarButtons = document.querySelectorAll(".editor-toolbar .btn");
+    const editorTextArea = document.querySelector(".editor-textarea");
+
+    // Handle command buttons
+    toolbarButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            const command = button.getAttribute("data-command");
+
+            // Handle text formatting commands
+            if (
+                command === "bold" ||
+                command === "italic" ||
+                command === "underline" ||
+                command === "strikeThrough" ||
+                command === "insertOrderedList" ||
+                command === "insertUnorderedList"
+            ) {
+                document.execCommand(command, false, null);
+            }
+
+            // Toggle active state for the clicked button
+            toggleActiveState(button, command);
+        });
+    });
+
+    // Handle font size change
+    const fontSizeSelect = document.querySelector(".font-size");
+    fontSizeSelect.addEventListener("change", () => {
+        const fontSizeValue = fontSizeSelect.value;
+        document.execCommand("fontSize", false, fontSizeValue);
+    });
+
+    // Toggle active state for buttons
+    function toggleActiveState(button, command) {
+        // For list commands (UL, OL), only allow one active
+        if (command === "insertOrderedList" || command === "insertUnorderedList") {
+            toolbarButtons.forEach(btn => {
+                const btnCommand = btn.getAttribute("data-command");
+                if (
+                    btnCommand === "insertOrderedList" ||
+                    btnCommand === "insertUnorderedList"
+                ) {
+                    btn.classList.remove("active");
+                }
+            });
+            button.classList.toggle("active");
+        } else {
+            // For other commands, toggle individually
+            button.classList.toggle("active");
+        }
+    }
+});
+
+    </script>
+</body>
+</html>
